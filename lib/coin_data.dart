@@ -32,7 +32,7 @@ const List<String> cryptoList = [
   'ETH',
   'LTC',
 ];
-
+//https://apiv2.bitcoinaverage.com/convert/global?from=USD&to=ETH&amount=2
 const bitcoinAverageURL =
     'https://apiv2.bitcoinaverage.com/indices/global/ticker';
 

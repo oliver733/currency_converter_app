@@ -65,36 +65,29 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: Text(
-            'Currency Converter',
-            style: TextStyle(color: MyColors.grey),
-          ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(
+          'Currency Converter',
+          style: TextStyle(color: MyColors.grey),
         ),
-        body: Column(
-          children: <Widget>[
-            Flexible(
-              flex: 1,
-              child: KeyboardActions(
-                config: _buildConfig(context),
-                child: _fromCurrencyView(),
-              ),
+      ),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: KeyboardActions(
+              config: _buildConfig(context),
+              child: _fromCurrencyView(),
             ),
-            Flexible(
-              flex: 3,
-              child: Column(
-                children: <Widget>[
-                  _cryptoFiatSwitch(),
-                  _filterDropDown(),
-                  Expanded(
-                    child: _resultList(),
-                  ),
-                ],
-              ),
-            )
-          ],
-        ));
+          ),
+          _cryptoFiatSwitch(),
+          _filterDropDown(),
+          Expanded(
+            child: _resultList(),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _cryptoFiatSwitch() {
