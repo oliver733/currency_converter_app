@@ -1,5 +1,6 @@
 import 'package:currency_converter/coin_data.dart';
 import 'package:currency_converter/colors.dart';
+import 'package:currency_converter/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
@@ -16,9 +17,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   FocusNode _amountFocusNode = FocusNode();
   CoinData _coinData;
   TabController _tabController;
-  TextEditingController _amountController = TextEditingController(text: "0.00");
-
-  double _selectedAmount = 0.00;
+  TextEditingController _amountController = TextEditingController(text: "1.00");
+  double _selectedAmount = 1.00;
   String _selectedCurrency = "USD";
 
   KeyboardActionsConfig _buildConfig(BuildContext context) {
@@ -51,6 +51,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void initState() {
     _coinData = CoinData();
     _tabController = TabController(initialIndex: 0, length: 2, vsync: this);
+    _getNewResult();
     super.initState();
   }
 
@@ -75,6 +76,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           'Currency Converter',
           style: TextStyle(color: MyColors.grey),
         ),
+        leading: IconButton(
+          icon: Icon(Icons.more_vert),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SettingsPage(),
+              ),
+            );
+          },
+        ),
       ),
       body: Column(
         children: <Widget>[
@@ -85,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             ),
           ),
           // _cryptoFiatSwitch(),
-          _filterDropDown(),
+          // _filterAndAddRow(),
           Expanded(
             child: _resultList(),
           ),
@@ -94,64 +106,68 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _cryptoFiatSwitch() {
-    return Container(
-      padding: EdgeInsets.all(20),
-      child: TabBar(
-        labelStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        labelColor: Colors.black,
-        unselectedLabelColor: MyColors.grey,
-        unselectedLabelStyle: TextStyle(fontSize: 16),
-        indicatorColor: MyColors.blue,
-        indicatorSize: TabBarIndicatorSize.label,
-        controller: _tabController,
-        tabs: <Widget>[
-          Tab(
-            child: Text(
-              "Crypto",
-            ),
-          ),
-          Tab(
-            child: Text(
-              "Fiat",
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+//TODO: add switch to Fiat currency
+  // Widget _cryptoFiatSwitch() {
+  //   return Container(
+  //     padding: EdgeInsets.all(20),
+  //     child: TabBar(
+  //       labelStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  //       labelColor: Colors.black,
+  //       unselectedLabelColor: MyColors.grey,
+  //       unselectedLabelStyle: TextStyle(fontSize: 16),
+  //       indicatorColor: MyColors.blue,
+  //       indicatorSize: TabBarIndicatorSize.label,
+  //       controller: _tabController,
+  //       tabs: <Widget>[
+  //         Tab(
+  //           child: Text(
+  //             "Crypto",
+  //           ),
+  //         ),
+  //         Tab(
+  //           child: Text(
+  //             "Fiat",
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  Widget _filterDropDown() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.all(20),
-          child: Row(
-            children: <Widget>[
-              Text(
-                "Alphabetical",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-              ),
-              Icon(
-                Icons.arrow_drop_down,
-                color: MyColors.grey,
-              )
-            ],
-          ),
-        ),
-        IconButton(
-          onPressed: () {
-            // TODO: add currency
-          },
-          icon: Icon(
-            Icons.add,
-            color: MyColors.grey,
-          ),
-        )
-      ],
-    );
-  }
+//TODO: add filter option
+  // Widget _filterAndAddRow() {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //     children: <Widget>[
+  //       Container(),
+  //       // Container(
+  //       //   padding: EdgeInsets.all(20),
+  //       //   child: Row(
+  //       //     children: <Widget>[
+  //       //       Text(
+  //       //         "Alphabetical",
+  //       //         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+  //       //       ),
+  //       //       Icon(
+  //       //         Icons.arrow_drop_down,
+  //       //         color: MyColors.grey,
+  //       //       )
+  //       //     ],
+  //       //   ),
+  //       // ),
+  //       IconButton(
+  //         onPressed: () {
+  //           // TODO: show full screen list of available currencies..
+  //           // TODO: add currency
+  //         },
+  //         icon: Icon(
+  //           Icons.add,
+  //           color: MyColors.grey,
+  //         ),
+  //       )
+  //     ],
+  //   );
+  // }
 
   Widget _resultList() {
     return TabBarView(
@@ -166,7 +182,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           },
         ),
 
-        Container()
+        Container() // TODO: add tab view for fiat currncy
         // ListView.builder(
         //   itemCount: _currencyResults?.length ?? 0,
         //   itemBuilder: (context, index) {
@@ -247,7 +263,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                // dropdown..
+                // TODO: add dropdown to change base currency
                 "\$",
                 style: TextStyle(fontSize: 60, fontWeight: FontWeight.w900),
               ),

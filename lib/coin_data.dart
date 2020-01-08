@@ -36,16 +36,11 @@ const List<String> currenciesList = [
   'ZAR'
 ];
 
-List<CurrencyName> allCryptoList = [
-  CurrencyName(shortName: "BTC", longName: "Bitcoin"),
-  CurrencyName(shortName: "ETH", longName: "Etherium"),
-  CurrencyName(shortName: "LTC", longName: "Litecoin")
-];
-
 class CoinData {
   List<CurrencyName> selectedCurrencies = [
     CurrencyName(shortName: "BTC", longName: "Bitcoin"),
     CurrencyName(shortName: "ETH", longName: "Etherium"),
+    CurrencyName(shortName: "LTC", longName: "Litecoin")
   ];
 
   Future<Map<CurrencyName, double>> getCoinData({
