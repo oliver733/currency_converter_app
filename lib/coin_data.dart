@@ -1,7 +1,23 @@
 import 'dart:convert';
-import 'package:currency_converter/currency_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
+class CurrencyName {
+  final String longName;
+  final String shortName;
+
+  CurrencyName({
+    @required this.longName,
+    @required this.shortName,
+  });
+}
+
+class CurrencyResult {
+  final CurrencyName currencyName;
+  final double amount;
+
+  CurrencyResult({@required this.currencyName, @required this.amount});
+}
 
 const List<String> currenciesList = [
   'AUD',
@@ -27,44 +43,40 @@ const List<String> currenciesList = [
   'ZAR'
 ];
 
-const List<String> cryptoList = [
-  'BTC',
-  'ETH',
-  'LTC',
+List<CurrencyName> allCryptoList = [
+  CurrencyName(shortName: "BTC", longName: "Bitcoin"),
+  CurrencyName(shortName: "ETH", longName: "Etherium"),
+  CurrencyName(shortName: "LTC", longName: "Litecoin")
 ];
-//https://apiv2.bitcoinaverage.com/convert/global?from=USD&to=ETH&amount=2
-const bitcoinAverageURL =
-    'https://apiv2.bitcoinaverage.com/indices/global/ticker';
 
 class CoinData {
-  List<String> _toCurrencies = ["BTC", "ETH"];
+  List<CurrencyName> selectedCurrencies = [
+    CurrencyName(shortName: "BTC", longName: "Bitcoin"),
+    CurrencyName(shortName: "ETH", longName: "Etherium"),
+  ];
 
   Future<List<CurrencyResult>> getCoinData({
     @required double amount,
-    @required String selectedCurrency,
+    @required String fromCurrency,
   }) async {
-    List<CurrencyResult> currencyResults;
-
-    for (String cryptoCurrency in _toCurrencies) {
-      String requestURL = '$bitcoinAverageURL/$cryptoCurrency$selectedCurrency';
-      //TODO: change.. set amount in api url
+    List<CurrencyResult> result = List<CurrencyResult>();
+    for (CurrencyName cryptoCurrency in selectedCurrencies) {
+      String requestURL =
+          'https://apiv2.bitcoinaverage.com/convert/global?from=$fromCurrency&to=${cryptoCurrency.shortName}&amount=$amount';
 
       http.Response response = await http.get(requestURL);
       if (response.statusCode == 200) {
         var decodedData = jsonDecode(response.body);
-        double value = decodedData['last'];
-        String longName = "TEST"; // TODO: get long name
-        String shortName = "TEST"; // TODO: get short name
-        currencyResults.add(
-          CurrencyResult(
-              longName: longName, shortName: shortName, value: value),
-        );
+        if (decodedData['success'] == true) {
+          double price = decodedData['price'];
+          result
+              .add(CurrencyResult(currencyName: cryptoCurrency, amount: price));
+        }
       } else {
         print(response.statusCode);
-        throw 'Problem with the get request';
       }
     }
 
-    return currencyResults;
+    return result;
   }
 }

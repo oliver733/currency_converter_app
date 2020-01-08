@@ -1,6 +1,5 @@
 import 'package:currency_converter/coin_data.dart';
 import 'package:currency_converter/colors.dart';
-import 'package:currency_converter/currency_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
@@ -13,11 +12,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+  List<CurrencyResult> _result;
   FocusNode _amountFocusNode = FocusNode();
   CoinData _coinData;
   TabController _tabController;
   TextEditingController _amountController = TextEditingController(text: "0.00");
-  List<CurrencyResult> _currencyResults;
 
   double _selectedAmount = 0.00;
   String _selectedCurrency = "USD";
@@ -29,6 +28,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       nextFocus: false,
       actions: [
         KeyboardAction(
+          onTapAction: () {
+            _getNewResult();
+          },
           focusNode: _amountFocusNode,
           closeWidget: Padding(
             padding: EdgeInsets.all(5.0),
@@ -52,13 +54,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     super.initState();
   }
 
-  void _addResultCurrency() {}
-
-  void _getResult() async {
-    List<CurrencyResult> result = await _coinData.getCoinData(
-        amount: _selectedAmount, selectedCurrency: _selectedCurrency);
+  void _getNewResult() async {
     setState(() {
-      _currencyResults = result;
+      _result = null;
+    });
+    List<CurrencyResult> result = await _coinData.getCoinData(
+        amount: _selectedAmount, fromCurrency: _selectedCurrency);
+
+    setState(() {
+      _result = result;
     });
   }
 
@@ -80,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               child: _fromCurrencyView(),
             ),
           ),
-          _cryptoFiatSwitch(),
+          // _cryptoFiatSwitch(),
           _filterDropDown(),
           Expanded(
             child: _resultList(),
@@ -138,7 +142,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         ),
         IconButton(
           onPressed: () {
-            _addResultCurrency();
+            // TODO: add currency
           },
           icon: Icon(
             Icons.add,
@@ -154,22 +158,27 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       controller: _tabController,
       children: <Widget>[
         ListView.builder(
-          itemCount: _currencyResults?.length ?? 0,
+          itemCount: _result?.length ?? 0,
           itemBuilder: (context, index) {
-            return _resultCard(currencyResult: _currencyResults[index]);
+            return _resultCard(
+                currencyName: _result[index].currencyName,
+                amount: _result[index].amount);
           },
         ),
-        ListView.builder(
-          itemCount: _currencyResults?.length ?? 0,
-          itemBuilder: (context, index) {
-            return _resultCard(currencyResult: _currencyResults[index]);
-          },
-        ),
+
+        Container()
+        // ListView.builder(
+        //   itemCount: _currencyResults?.length ?? 0,
+        //   itemBuilder: (context, index) {
+        //     return _resultCard();
+        //   },
+        // ),
       ],
     );
   }
 
-  Widget _resultCard({@required CurrencyResult currencyResult}) {
+  Widget _resultCard(
+      {@required CurrencyName currencyName, @required double amount}) {
     return Container(
       padding: EdgeInsets.all(5),
       child: Card(
@@ -179,12 +188,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         color: MyColors.blue,
         child: ListTile(
           title: Text(
-            currencyResult.longName,
+            currencyName.longName,
             style: TextStyle(
                 fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           trailing: Text(
-            '${currencyResult.value} ${currencyResult.shortName}',
+            '$amount ${currencyName.shortName}',
             style: TextStyle(
                 fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
           ),
@@ -214,7 +223,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   });
                 },
                 onSubmitted: (_) {
-                  _getResult();
+                  _getNewResult();
                 },
                 textAlign: TextAlign.end,
                 textInputAction: TextInputAction.done,
