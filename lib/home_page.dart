@@ -12,7 +12,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
-  List<CurrencyResult> _result;
+  Map<CurrencyName, double> _result;
   FocusNode _amountFocusNode = FocusNode();
   CoinData _coinData;
   TabController _tabController;
@@ -58,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     setState(() {
       _result = null;
     });
-    List<CurrencyResult> result = await _coinData.getCoinData(
+    Map<CurrencyName, double> result = await _coinData.getCoinData(
         amount: _selectedAmount, fromCurrency: _selectedCurrency);
 
     setState(() {
@@ -158,11 +158,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       controller: _tabController,
       children: <Widget>[
         ListView.builder(
-          itemCount: _result?.length ?? 0,
+          itemCount: _coinData.selectedCurrencies.length,
           itemBuilder: (context, index) {
             return _resultCard(
-                currencyName: _result[index].currencyName,
-                amount: _result[index].amount);
+              currencyName: _coinData.selectedCurrencies[index],
+            );
           },
         ),
 
@@ -177,8 +177,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _resultCard(
-      {@required CurrencyName currencyName, @required double amount}) {
+  Widget _resultCard({@required CurrencyName currencyName}) {
+    double amount;
+    if (_result != null && _result[currencyName] != null) {
+      amount = _result[currencyName];
+    }
     return Container(
       padding: EdgeInsets.all(5),
       child: Card(
@@ -192,11 +195,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             style: TextStyle(
                 fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
           ),
-          trailing: Text(
-            '$amount ${currencyName.shortName}',
-            style: TextStyle(
-                fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
+          trailing: amount == null
+              ? null
+              : Text(
+                  '$amount ${currencyName.shortName}',
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
         ),
       ),
     );

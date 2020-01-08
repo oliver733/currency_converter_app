@@ -12,13 +12,6 @@ class CurrencyName {
   });
 }
 
-class CurrencyResult {
-  final CurrencyName currencyName;
-  final double amount;
-
-  CurrencyResult({@required this.currencyName, @required this.amount});
-}
-
 const List<String> currenciesList = [
   'AUD',
   'BRL',
@@ -55,11 +48,11 @@ class CoinData {
     CurrencyName(shortName: "ETH", longName: "Etherium"),
   ];
 
-  Future<List<CurrencyResult>> getCoinData({
+  Future<Map<CurrencyName, double>> getCoinData({
     @required double amount,
     @required String fromCurrency,
   }) async {
-    List<CurrencyResult> result = List<CurrencyResult>();
+    Map<CurrencyName, double> result = Map<CurrencyName, double>();
     for (CurrencyName cryptoCurrency in selectedCurrencies) {
       String requestURL =
           'https://apiv2.bitcoinaverage.com/convert/global?from=$fromCurrency&to=${cryptoCurrency.shortName}&amount=$amount';
@@ -69,8 +62,7 @@ class CoinData {
         var decodedData = jsonDecode(response.body);
         if (decodedData['success'] == true) {
           double price = decodedData['price'];
-          result
-              .add(CurrencyResult(currencyName: cryptoCurrency, amount: price));
+          result.putIfAbsent(cryptoCurrency, () => price);
         }
       } else {
         print(response.statusCode);
